@@ -54,6 +54,7 @@ const finishedLoadingImages = () => {
   player.endFill();
   player.x = GAME_BOARD_WIDTH / 2;
   player.y = GAME_BOARD_HEIGHT / 2;
+  app.stage.addChild(player);
 
   logoWhiteDot = new PIXI.Graphics();
   logoWhiteDot.beginFill(COLOR_WHITE);
@@ -69,7 +70,7 @@ const finishedLoadingImages = () => {
   logoOrangeDot.visible = false;
   app.stage.addChild(logoOrangeDot);
 
-  app.stage.addChild(player);
+
 
   placeLogo();
 
