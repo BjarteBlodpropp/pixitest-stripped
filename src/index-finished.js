@@ -24,7 +24,6 @@ document.getElementById('gameContainer').appendChild(app.view);
 app.renderer.backgroundColor = COLOR_BACKGROUND;
 app.renderer.resize(GAME_BOARD_WIDTH, GAME_BOARD_HEIGHT);
 
-
 let currentDirection = DIRECTIONS.RIGHT;
 let innitLogo;
 let player;
@@ -34,8 +33,80 @@ let gameIsRunning = false;
 let target;
 let targetIsWhite = true;
 
+const finishedLoadingImages = () => {
+  innitLogo = new PIXI.Sprite(PIXI.Loader.shared.resources.innit.texture);
+  app.stage.addChild(innitLogo);
 
-// Insert game
+  setupKeyListeners();
+
+  target = new PIXI.Graphics();
+  target.beginFill(COLOR_BACKGROUND);
+  target.lineStyle(2, COLOR_WHITE);
+  target.drawCircle(0, 0, TARGET_RADIUS);
+  target.endFill();
+  app.stage.addChild(target);
+
+  player = new PIXI.Graphics();
+  player.beginFill(COLOR_WHITE);
+  player.drawCircle(0,0, CIRCLE_RADIUS);
+  player.endFill();
+  player.x = GAME_BOARD_WIDTH / 2;
+  player.y = GAME_BOARD_HEIGHT / 2;
+  app.stage.addChild(player);
+
+  logoWhiteDot = new PIXI.Graphics();
+  logoWhiteDot.beginFill(COLOR_WHITE);
+  logoWhiteDot.drawCircle(0,0, CIRCLE_RADIUS);
+  logoWhiteDot.endFill();
+  logoWhiteDot.visible = false;
+  app.stage.addChild(logoWhiteDot);
+
+  logoOrangeDot = new PIXI.Graphics();
+  logoOrangeDot.beginFill(COLOR_ORANGE);
+  logoOrangeDot.drawCircle(0,0, CIRCLE_RADIUS);
+  logoOrangeDot.endFill();
+  logoOrangeDot.visible = false;
+  app.stage.addChild(logoOrangeDot);
+
+  placeLogo();
+
+  app.ticker.add(() => loop());
+};
+
+function loop() {
+  if(gameIsRunning) {
+    movePlayer();
+
+    if(playerHitTarget()) {
+      if (targetIsWhite) {
+        targetIsWhite = false;
+        logoWhiteDot.visible = true;
+
+        // Remove old target and add new
+        app.stage.removeChild(target);
+        target = new PIXI.Graphics();
+        target.beginFill(COLOR_BACKGROUND);
+        target.lineStyle(2, COLOR_ORANGE);
+        target.drawCircle(0,0, TARGET_RADIUS);
+        target.endFill();
+        app.stage.addChild(target);
+
+        // Change color of player
+        player.beginFill(COLOR_ORANGE);
+        player.drawCircle(0,0,CIRCLE_RADIUS);
+        player.endFill();
+
+        placeLogo();
+      } else {
+        logoOrangeDot.visible = true;
+        app.stage.removeChild(target);
+        target = new PIXI.Graphics();
+        targetIsWhite = true;
+        player.visible = false;
+      }
+    }
+  }
+}
 
 function movePlayer() {
   switch (currentDirection) {
@@ -122,3 +193,5 @@ function placeLogo() {
     target.y = innitLogo.y + 5;
   }
 }
+
+PIXI.Loader.shared.add('innit', "./images/logo.png").load(finishedLoadingImages);
